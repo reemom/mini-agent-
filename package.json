@@ -1,0 +1,18 @@
+{
+  "name": "mini-agent",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "A minimal Node.js CLI agent implementing the Agent Skills specification with Claude Sonnet.",
+  "bin": {
+    "mini-agent": "src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "check": "node --check src/cli.js && node --check src/agent.js && node --check src/skills.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.60.0",
+    "yaml": "^2.8.1"
+  }
+}
