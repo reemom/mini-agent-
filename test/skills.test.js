@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { loadSkills, skillCatalog } from "../src/skills.js";
+import { loadSkillBody, loadSkills, skillCatalog } from "../src/skills.js";
 
 test("discovers exactly three valid skills and exposes metadata only in the catalog", async () => {
   const skills = await loadSkills(path.resolve(".skills"));
@@ -14,18 +14,19 @@ test("discovers exactly three valid skills and exposes metadata only in the cata
   const catalog = skillCatalog(skills);
   assert.deepEqual(Object.keys(catalog[0]).sort(), ["description", "name"]);
   assert.ok(catalog.every((skill) => !Object.hasOwn(skill, "body")));
+  assert.ok(skills.every((skill) => !Object.hasOwn(skill, "body")));
 });
 
-test("preserves the supplied welcome-me skill body", async () => {
+test("loads a skill body only when explicitly activated", async () => {
   const skills = await loadSkills(path.resolve(".skills"));
   const welcome = skills.find((skill) => skill.name === "welcome-me");
 
   assert.ok(welcome);
-  assert.match(welcome.body, /^# Welcome Me Skill/);
-  assert.match(
-    welcome.body,
-    /> Welcome to our mini-agent assignment!/
-  );
+  assert.equal(Object.hasOwn(welcome, "body"), false);
+
+  const body = await loadSkillBody(welcome);
+  assert.match(body, /^\n# Welcome Me Skill/);
+  assert.match(body, /> Welcome to our mini-agent assignment!/);
 });
 
 test("rejects a skill whose directory name does not match its frontmatter name", async () => {
