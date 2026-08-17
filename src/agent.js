@@ -30,6 +30,22 @@ function makeTool(skills) {
   };
 }
 
+function debugOutput(loaded, byName) {
+  console.error("[debug] skill bodies loaded:");
+
+  if (!loaded.size) {
+    console.error("(none)");
+    return;
+  }
+
+  for (const name of loaded) {
+    const skill = byName.get(name);
+    console.error(`\n--- ${name} ---`);
+    console.error(skill.body);
+    console.error(`--- end ${name} ---`);
+  }
+}
+
 export async function runAgent(prompt, skills, { debug = false, model = DEFAULT_MODEL } = {}) {
   if (!process.env.ANTHROPIC_API_KEY) {
     throw new Error("ANTHROPIC_API_KEY is not set. Set it before running mini-agent.");
@@ -59,9 +75,7 @@ export async function runAgent(prompt, skills, { debug = false, model = DEFAULT_
         .map((block) => block.text)
         .join("\n");
 
-      if (debug) {
-        console.error(`[debug] loaded skills: ${loaded.size ? [...loaded].join(", ") : "none"}`);
-      }
+      if (debug) debugOutput(loaded, byName);
       return text;
     }
 
